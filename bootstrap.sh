@@ -5,6 +5,7 @@ git_uri='https://github.com/spf13/spf13-vim.git'
 git_branch='3.0'
 debug_mode='0'
 fork_maintainer='0'
+dotfiles="$HOME/dotfiles"
 
 ############################  BASIC SETUP TOOLS
 msg() {
@@ -63,12 +64,12 @@ upgrade_repo() {
       msg "trying to update $1"
 
       if [ "$1" = "$app_name" ]; then
-          cd "$HOME/.$app_name-3" &&
+          cd "$dotfiles/.$app_name-3" &&
           git pull origin "$git_branch"
       fi
 
       if [ "$1" = "vundle" ]; then
-          cd "$HOME/.vim/bundle/vundle" &&
+          cd "$dotfiles/.vim/bundle/vundle" &&
           git pull origin master
       fi
 
@@ -79,7 +80,7 @@ upgrade_repo() {
 
 clone_repo() {
     program_exists "git" "Sorry, we cannot continue without GIT, please install it first."
-    endpath="$HOME/.$app_name-3"
+    endpath="$dotfiles/.$app_name-3"
 
     if [ ! -e "$endpath/.git" ]; then
         git clone --recursive -b "$git_branch" "$git_uri" "$endpath"
@@ -92,8 +93,8 @@ clone_repo() {
 }
 
 clone_vundle() {
-    if [ ! -e "$HOME/.vim/bundle/vundle" ]; then
-        git clone https://github.com/gmarik/vundle.git "$HOME/.vim/bundle/vundle"
+    if [ ! -e "$dotfiles/.vim/bundle/vundle" ]; then
+        git clone https://github.com/gmarik/vundle.git "$dotfiles/.vim/bundle/vundle"
     else
         upgrade_repo "vundle"   "Successfully updated vundle"
     fi
@@ -103,34 +104,34 @@ clone_vundle() {
 }
 
 create_symlinks() {
-    endpath="$HOME/.$app_name-3"
+    endpath="$dotfiles/.$app_name-3"
 
     if [ ! -d "$endpath/.vim/bundle" ]; then
         mkdir -p "$endpath/.vim/bundle"
     fi
 
-    lnif "$endpath/.vimrc"              "$HOME/.vimrc"
-    lnif "$endpath/.vimrc.bundles"      "$HOME/.vimrc.bundles"
-    lnif "$endpath/.vimrc.before"       "$HOME/.vimrc.before"
-    lnif "$endpath/.vim"                "$HOME/.vim"
+    lnif "$endpath/.vimrc"              "$dotfiles/.vimrc"
+    lnif "$endpath/.vimrc.bundles"      "$dotfiles/.vimrc.bundles"
+    lnif "$endpath/.vimrc.before"       "$dotfiles/.vimrc.before"
+    lnif "$endpath/.vim"                "$dotfiles/.vim"
 
     # Useful for fork maintainers
-    touch  "$HOME/.vimrc.local"
+    touch  "$dotfiles/.vimrc.local"
 
     if [ -e "$endpath/.vimrc.fork" ]; then
-        ln -sf "$endpath/.vimrc.fork" "$HOME/.vimrc.fork"
+        ln -sf "$endpath/.vimrc.fork" "$dotfiles/.vimrc.fork"
     elif [ "$fork_maintainer" -eq '1' ]; then
-        touch "$HOME/.vimrc.fork"
-        touch "$HOME/.vimrc.bundles.fork"
-        touch "$HOME/.vimrc.before.fork"
+        touch "$dotfiles/.vimrc.fork"
+        touch "$dotfiles/.vimrc.bundles.fork"
+        touch "$dotfiles/.vimrc.before.fork"
     fi
 
     if [ -e "$endpath/.vimrc.bundles.fork" ]; then
-        ln -sf "$endpath/.vimrc.bundles.fork" "$HOME/.vimrc.bundles.fork"
+        ln -sf "$endpath/.vimrc.bundles.fork" "$dotfiles/.vimrc.bundles.fork"
     fi
 
     if [ -e "$endpath/.vimrc.before.fork" ]; then
-        ln -sf "$endpath/.vimrc.before.fork" "$HOME/.vimrc.before.fork"
+        ln -sf "$endpath/.vimrc.before.fork" "$dotfiles/.vimrc.before.fork"
     fi
 
     ret="$?"
@@ -141,7 +142,7 @@ create_symlinks() {
 setup_vundle() {
     system_shell="$SHELL"
     export SHELL='/bin/sh'
-    vim -u "$HOME/.vimrc.bundles" +BundleInstall! +BundleClean +qall
+    vim -u "$dotfiles/.vimrc.bundles" +BundleInstall! +BundleClean +qall
     export SHELL="$system_shell"
 
     success "$1"
@@ -152,9 +153,9 @@ setup_vundle() {
 program_exists "vim" "To install $app_name you first need to install Vim."
 
 do_backup   "Your old vim stuff has a suffix now and looks like .vim.`date +%Y%m%d%S`" \
-        "$HOME/.vim" \
-        "$HOME/.vimrc" \
-        "$HOME/.gvimrc"
+        "$dotfiles/.vim" \
+        "$dotfiles/.vimrc" \
+        "$dotfiles/.gvimrc"
 
 clone_repo      "Successfully cloned $app_name"
 
